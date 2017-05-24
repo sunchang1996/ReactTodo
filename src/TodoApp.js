@@ -1,15 +1,17 @@
 import React from 'react';
 import TodoHead from './TodoHead';
 import TodoItem from  './TodoItem';
-import TodoFooter from  './TodoFooter'
+import TodoFooter from  './TodoFooter';
+import * as filterTypes from './filtertypes';// 把里面的方法拿出来 给filterTypes 作为它的参数
 export  default  class TodoApp extends React.Component {
     constructor(props){
         super(props); // 父类的构造函数
         this.state={todos:[
             {id:Math.random(),title:'今天学习react',completed:false},//初始化默认状态
             {id:Math.random(),title:'今天学习vue',completed:true}
-        ]}
-
+        ],
+            filterType:filterTypes.ACTIVE
+        }
     }
     toggle=(id)=>{
         let todos = this.state.todos;
@@ -40,9 +42,28 @@ export  default  class TodoApp extends React.Component {
         todos = todos.map(todo=>{todo.completed = checked; return todo});
         this.setState ({todos})
     };
+    changeFilterType=(filterType)=>{
+        this.setState({filterType});
+    };
+    clearCompleted=()=>{
+        let todos = this.state.todos;
+        todos = todos.filter(todo=>!todo.completed);
+        this.setState({todos});
+    }
     render() {
         let todos = this.state.todos;
         let activeTodoCount = todos.reduce((count,todo)=>count+(todo.completed?0:1),0);
+        let completedTodoCount = todos.length-activeTodoCount;
+        let showTodos = todos.filter((todo)=>{
+            switch (this.state.filterType){
+                case filterTypes.ACTIVE: // 显示未完成的
+                    return !todo.completed;
+                case filterTypes.COMPLETED: // 显示完成的
+                    return todo.completed;
+                default:
+                    return true ;
+            }
+        })
         let main =(
             <ul className="list-group">
                 {
@@ -52,7 +73,7 @@ export  default  class TodoApp extends React.Component {
                     </li> : null
                 }
                 {
-                    this.state.todos.map((todo,index)=><TodoItem toggle={this.toggle} todo={todo} key={index} remove={this.remove}/>)
+                    showTodos.map((todo,index)=><TodoItem toggle={this.toggle} todo={todo} key={index} remove={this.remove}/>)
                 }
              </ul>
         )
@@ -66,7 +87,13 @@ export  default  class TodoApp extends React.Component {
                         {main}
                     </div>
                     <div className="panel-footer" >
-                        <TodoFooter activeTodoCount={activeTodoCount}/>
+                        {this.changeFilterType}
+                        <TodoFooter activeTodoCount={activeTodoCount}
+                                    changeFilterType={this.changeFilterType}
+                                    filterType={this.state.filterType}
+                                    clearCompleted={this.clearCompleted}
+                                    completedTodoCount={completedTodoCount}
+                        />
                     </div>
                 </div>
             </div>
