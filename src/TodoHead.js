@@ -3,7 +3,7 @@ const ENTRY_KEY = 13;
 export default class TodoHead extends React.Component{
 
     handleKeyDown=(e)=>{
-       if(e.keyCode === ENTRY_KEY){
+       if(e.keyCode === ENTRY_KEY&&e.target.value.length>0){
            let title= e.target.value;
            this.props.addTodo({title});
            e.target.value='';
