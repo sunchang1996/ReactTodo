@@ -6,30 +6,11 @@ import * as filterTypes from './filtertypes';// 把里面的方法拿出来 给f
 export  default  class TodoApp extends React.Component {
     constructor(props){
         super(props); // 父类的构造函数
-        this.state={todos:[
-            {id:Math.random(),title:'今天学习react',completed:false},//初始化默认状态
-            {id:Math.random(),title:'今天学习vue',completed:true}
-        ],
-            filterType:filterTypes.ACTIVE
+        this.state={
+            filterType:filterTypes.ALL
         }
     }
-    toggle=(id)=>{
-        let todos = this.state.todos;
-        todos.map(todo=>{
-            if(todo.id === id){
-                todo.completed = !todo.completed;
-            }
-            return todo;
-        });
-        this.setState({todos});
-    };
-    addTodo=(todo)=>{
-        todo = Object.assign(todo,{id:Date.now(),completed:false});
-        // todo.id= Date.now();
-        let todos = this.state.todos;
-        todos.push(todo);
-        this.setState({todo})
-    };
+
     remove= id=>{
         let todos = this.state.todos;
         let index = todos.findIndex(todo=>todo.id===id); // findIndex:查找符合条件的索引 找到返回当前的索引 没有找到返回-1
@@ -51,7 +32,7 @@ export  default  class TodoApp extends React.Component {
         this.setState({todos});
     }
     render() {
-        let todos = this.state.todos;
+        let todos = this.props.model.todos;
         let activeTodoCount = todos.reduce((count,todo)=>count+(todo.completed?0:1),0);
         let completedTodoCount = todos.length-activeTodoCount;
         let showTodos = todos.filter((todo)=>{
@@ -81,7 +62,7 @@ export  default  class TodoApp extends React.Component {
             <div className="container" style={{marginTop:30}}>
                 <div className="panel-default">
                     <div className="panel-heading">
-                        <TodoHead addTodo={this.addTodo}/>
+                        <TodoHead addTodo={this.props.model.addTodo}/>
                     </div>
                     <div className="panel-body">
                         {main}
