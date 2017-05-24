@@ -10,20 +10,26 @@ export  default  class TodoApp extends React.Component {
         ]}
 
     }
+    addTodo=(todo)=>{
+        todo = Object.assign(todo,{id:Date.now(),completed:false});
+        // todo.id= Date.now();
+        let todos = this.state.todos;
+        todos.push(todo);
+        this.setState({todo})
+    }
     render() {
         let main =(
             <ul className="list-group">
                 {
                     this.state.todos.map((todo,index)=><TodoItem todo={todo} key={index}/>)
                 }
-
-            </ul>
+             </ul>
         )
         return (
             <div className="container" style={{marginTop:30}}>
                 <div className="panel-default">
                     <div className="panel-heading">
-                        <TodoHead/>
+                        <TodoHead addTodo={this.addTodo}/>
                     </div>
                     <div className="panel-body">
                         {main}
