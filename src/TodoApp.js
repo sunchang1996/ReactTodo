@@ -10,27 +10,9 @@ export  default  class TodoApp extends React.Component {
             filterType:filterTypes.ALL
         }
     }
-
-    remove= id=>{
-        let todos = this.state.todos;
-        let index = todos.findIndex(todo=>todo.id===id); // findIndex:查找符合条件的索引 找到返回当前的索引 没有找到返回-1
-        todos.splice(index,1);
-        this.setState(todos);
-    };
-    toggleAll =(event)=>{
-        let checked = event.target.checked;
-        let todos = this.state.todos;
-        todos = todos.map(todo=>{todo.completed = checked; return todo});
-        this.setState ({todos})
-    };
     changeFilterType=(filterType)=>{
         this.setState({filterType});
     };
-    clearCompleted=()=>{
-        let todos = this.state.todos;
-        todos = todos.filter(todo=>!todo.completed);
-        this.setState({todos});
-    }
     render() {
         let todos = this.props.model.todos;
         let activeTodoCount = todos.reduce((count,todo)=>count+(todo.completed?0:1),0);
@@ -44,17 +26,17 @@ export  default  class TodoApp extends React.Component {
                 default:
                     return true ;
             }
-        })
+        });
         let main =(
             <ul className="list-group">
                 {
                     todos.length > 0 ? <li className="list-group-item">
                         <input type="checkbox" checked={activeTodoCount === 0}
-                               onChange={this.toggleAll}/>{activeTodoCount === 0 ? "取消全选" : '全部选中'}
+                               onChange={this.props.model.toggleAll}/>{activeTodoCount === 0 ? "取消全选" : '全部选中'}
                     </li> : null
                 }
                 {
-                    showTodos.map((todo,index)=><TodoItem toggle={this.toggle} todo={todo} key={index} remove={this.remove}/>)
+                    showTodos.map((todo,index)=><TodoItem toggle={this.props.model.toggle} todo={todo} key={index} remove={this.props.model.remove}/>)
                 }
              </ul>
         )
@@ -68,11 +50,10 @@ export  default  class TodoApp extends React.Component {
                         {main}
                     </div>
                     <div className="panel-footer" >
-                        {this.changeFilterType}
                         <TodoFooter activeTodoCount={activeTodoCount}
                                     changeFilterType={this.changeFilterType}
                                     filterType={this.state.filterType}
-                                    clearCompleted={this.clearCompleted}
+                                    clearCompleted={this.props.model.clearCompleted}
                                     completedTodoCount={completedTodoCount}
                         />
                     </div>

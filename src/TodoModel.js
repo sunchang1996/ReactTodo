@@ -2,7 +2,7 @@ export default class TodoModel {
     constructor(){
         // 向 localsStorage 里面写入的时候需要这个key
         this.STORE_KEY = 'todos';
-        this.todos = JSON.parse(localStorage.getItem(this.STORE_KEY))||[];// 存放着所有的todos
+        this.todos = localStorage.getItem(this.STORE_KEY)?JSON.parse(localStorage.getItem(this.STORE_KEY)):[];// 存放着所有的todos
         //这里可以注册监听器，当模型数据发生变化之后会调用这些监听函数
         this.listeners = [];
     }
@@ -14,7 +14,8 @@ export default class TodoModel {
         this.listeners.forEach(listener =>listener());
     }
     saveAndNotify(todos){
-        this.todos = JSON.parse(localStorage.getItem(this.STORE_KEY));
+        localStorage.setItem(this.STORE_KEY,JSON.stringify(todos));
+        this.todos= todos;
         this.emit();
     }
     // 增加todo
@@ -22,8 +23,13 @@ export default class TodoModel {
         todo = Object.assign(todo,{id:Date.now(),completed:false});
         let todos = this.todos;
         todos.push(todo);
-        localStorage.setItem(this.STORE_KEY,JSON.stringify(todos));
-
+        this.saveAndNotify(todos)
+    };
+    remove= id=>{
+        let todos = this.todos;
+        let index = todos.findIndex(todo=>todo.id===id); // findIndex:查找符合条件的索引 找到返回当前的索引 没有找到返回-1
+        todos.splice(index,1);
+       this.saveAndNotify(todos);
     };
     toggle=(id)=>{
         let todos = this.todos;
@@ -35,5 +41,17 @@ export default class TodoModel {
         });
         this.saveAndNotify(todos);
     };
+    toggleAll =(event)=>{
+        let checked = event.target.checked;
+        let todos = this.todos;
+        todos = todos.map(todo=>{todo.completed = checked; return todo});
+        this.saveAndNotify(todos);
+    };
+
+    clearCompleted=()=>{
+        let todos = this.todos;
+        todos = todos.filter(todo=>!todo.completed);
+        this.saveAndNotify(todos)
+    }
 
 }
